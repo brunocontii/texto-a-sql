@@ -2,7 +2,7 @@ import reflex as rx
 import texto_a_sql.styles.styles as styles
 import texto_a_sql.styles.colors as colors
 import texto_a_sql.components.special_button as eb
-from texto_a_sql.clases.InputState import InputState
+from texto_a_sql.state.InputState import InputState
 
 
 def input_component() -> rx.Component:

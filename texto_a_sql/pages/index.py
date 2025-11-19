@@ -1,9 +1,11 @@
 import reflex as rx
+import texto_a_sql.components.schema_builder as sb
 import texto_a_sql.components.nav_bar as nb
 import texto_a_sql.styles.colors as colors
 import texto_a_sql.components.input_component as ic
 import texto_a_sql.components.area_component as ac
 import texto_a_sql.styles.styles as styles
+
 
 @rx.page(
     title= "Texto a SQL - Generador de Consultas SQL desde Texto Natural"
@@ -26,6 +28,7 @@ def index() -> rx.Component:
                     width="100%",
                 ),
                 ic.input_component(),
+                sb.schema_builder(),
                 ac.area_component(),
                 spacing="4",
                 width=["95%", "80%", "60%"],

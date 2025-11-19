@@ -6,6 +6,7 @@ from .fonts import Font as Font, FontWeight as FontWeight
 
 class Size(Enum):
     ZERO = "0px !important"
+    NEGATIVE_SMALL = "-0.5em"
     SMALL="0.5em"
     DEFAULT="1em"
     MEDIUM="2em"
