@@ -30,12 +30,10 @@ def column_input(table, column, is_last: bool):
             opacity="0",
             _hover={"opacity": "1"},
             transition="opacity 0.2s",
-            # Mostrar cuando el padre tenga hover
             class_name="delete-btn",
         ),
         position="relative",
         flex_shrink="0", 
-        # Mostrar el botón cuando se hace hover sobre este box
         _hover={
             "& .delete-btn": {
                 "opacity": "1"

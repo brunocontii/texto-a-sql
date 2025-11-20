@@ -1,9 +1,11 @@
 import reflex as rx
 import texto_a_sql.styles.styles as styles
 import texto_a_sql.styles.colors as colors
+from texto_a_sql.state.QueryState import QueryState
 
 def area_component() -> rx.Component:
     return rx.text_area(
+            value=QueryState.result_sql,
             placeholder="SELECT * FROM productos WHERE precio > 1000;",
             rows="4",
             width="80%",

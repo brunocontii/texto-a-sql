@@ -3,7 +3,7 @@ import texto_a_sql.styles.styles as styles
 import texto_a_sql.styles.colors as colors
 import texto_a_sql.components.special_button as eb
 from texto_a_sql.state.InputState import InputState
-
+from texto_a_sql.state.QueryState import QueryState
 
 def input_component() -> rx.Component:
     return rx.box(
@@ -25,7 +25,7 @@ def input_component() -> rx.Component:
             _placeholder={"font_size": ["0.95em", "1em", "1.05em"]},
             bg=colors.Color.BACKGROUND.value,
         ),
-        eb.special_button("Enviar", icono="send-horizontal"),
+        eb.special_button("Enviar", icono="send-horizontal", on_click=QueryState.generate_sql),
         position="relative",
         width="80%",   
     )

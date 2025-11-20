@@ -1,1 +1,2 @@
-# entrenamiento o fine-tuning
+# entrenamiento y fine-tuning
+# aca iria la notebook terminada del entrenamiento

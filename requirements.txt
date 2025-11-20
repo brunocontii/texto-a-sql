@@ -1,2 +1,7 @@
 reflex
 reflex==0.8.19
+fastapi 
+uvicorn 
+transformers 
+torch
+protobuf
