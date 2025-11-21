@@ -5,11 +5,7 @@ from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 import os
 
 class SQLGenerator:
-    def __init__(self, model_path: str = "./backend/codet5_final"):
-        # ruta relativa o absoluta correctamente, anda para ambas
-        if not os.path.isabs(model_path):
-            model_path = os.path.join(os.path.dirname(__file__), os.path.basename(model_path))
-        
+    def __init__(self, model_path: str = "brunnoconti/codet5-sql-generator"):        
         # si tenes gpu que agarre esa
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         
