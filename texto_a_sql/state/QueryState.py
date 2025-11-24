@@ -33,7 +33,7 @@ class QueryState(rx.State):
                 data = response.json()
                 self.result_sql = data["sql_query"]
             else:
-                self.result_sql = f"Error: {response.text}"
+                self.result_sql = f"Error: {response.json().get('error', 'Unknown error')}"
                 
         except Exception as e:
             self.result_sql = f"Error de conexión: {str(e)}"

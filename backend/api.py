@@ -33,10 +33,38 @@ def root():
 # endpoint POST, request requerido con el formato que tiene que ser, por la clase SQLRequest
 @app.post("/api/generate-sql")
 def generate_sql(request: SQLRequest):
+    print(f"📝 Texto natural: {request.natural_text}")
     print(f"🗂️ Schema (JSON): {request.db_schema}")
+    
+    # ver que la consulta no este vacia
+    if not request.natural_text or request.natural_text.strip() == "":
+        return JSONResponse(
+            status_code=400, 
+            content={"success": False, "error": "Debe ingresar un texto en lenguaje natural"}
+        )
+    
+    # ver que el schema no este vacio o sea invalido
+    if not request.db_schema:
+        return JSONResponse(
+            status_code=400,
+            content={"success": False, "error": "Debe proporcionar un schema de base de datos"}
+        )
+    
+    # ver que el schema no este vacio o incompleto
+    if isinstance(request.db_schema, list):
+        is_empty = all(
+            not item.get('schema_name') or item.get('schema_name', '').strip() == ''
+            for item in request.db_schema
+        )
+        if is_empty:
+            return JSONResponse(
+                status_code=400,
+                content={"success": False, "error": "El schema proporcionado está vacío o incompleto"}
+            )
+    
     try:
         generator = get_sql_generator() # agarro la instancia
-        sql_query = generator.generate_sql(request.natural_text, request.schema) # genero sql en dicha instancia
+        sql_query = generator.generate_sql(request.natural_text, request.db_schema) # genero sql en dicha instancia
         return { "success": True, "sql_query": sql_query}  # retorna json con el resultado
     except Exception as e:
         return JSONResponse(status_code=500, content={"success": False, "error": f"error interno: {str(e)}"})
