@@ -91,5 +91,5 @@ def schema_section():
         ),
         width="100%",
         border="2px solid var(--gray-3)",
-        _hover={"border_color": "var(--gray-8)", "transition": "0.3s"}
+        _hover={"border_color": "var(--blue-8)", "transition": "0.3s"}
     )
