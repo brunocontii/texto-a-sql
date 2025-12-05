@@ -15,16 +15,18 @@ class AppState(rx.State):
     is_copied: bool = False     # estado de copiado
     
     # placeholders
-    schema_placeholder: str = """Ejemplo:
+    schema_placeholder: str = """CREATE TABLE Pet (
+ id INTEGER PRIMARY KEY,
+ name TEXT,
+ owner_id INTEGER,
+ FOREIGN KEY (owner_id) REFERENCES Owner(id)
+);
+CREATE TABLE Owner (
+ id INTEGER PRIMARY KEY,
+ name TEXT
+);"""
 
-TABLE users (
-  id INT PRIMARY KEY,
-  name VARCHAR(255),
-  email VARCHAR(255),
-  created_at TIMESTAMP
-)"""
-
-    query_placeholder: str = "Ejemplo: Muéstrame todos los usuarios que hicieron una compra en los últimos 30 días..."
+    query_placeholder: str = "Show all of Mike's pets"
 
     # variable computada
     # se recalcula automaticamente cada vez que cambia 'query' o 'schema_input'.
@@ -53,7 +55,7 @@ TABLE users (
                 response = await client.post(
                     "http://127.0.0.1:8000/api/generate-sql",
                     json=payload,
-                    timeout=30.0
+                    timeout=None
                 )
             
             if response.status_code == 200:
