@@ -187,14 +187,19 @@ pip install -r requirements.txt
 ### 5️⃣ Ejecutar el proyecto
 Ejecuta en una terminal:
 ```bash
+cd backend/
 python3 apy.py
 ```
 
-Luego ejecuta en otra terminal:
+Luego ejecuta en otra terminal dentro de texto-a-sql:
 ```bash
 reflex run
 ```
 Por último abre el navegador y escribe:
 ```bash
 http://localhost:3000/
+```
+u otra opcion dentro de reflex run vas a 
+```bash
+App running at: http://localhost:3000/
 ```
