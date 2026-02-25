@@ -23,36 +23,25 @@ class SQLGenerator:
     def _serialize_schema(self, user_schema: str) -> str:
         """
         Convierte SQL DDL al formato usado para entrenar
+        Ejemplo salida: table_name : text col1 , number col2 (pk) | foreign keys: table_name.col = ref_table.ref_col
         """
-        
-        # verificacion de esquema basico
         if not user_schema or "CREATE TABLE" not in user_schema.upper():
             return user_schema.strip()
 
-        # primero extraer mapeo de fks con regex
-        # normalizar espacios y saltos de linea a un solo espacio para facilitar la busqueda
         normalized_schema = re.sub(r'\s+', ' ', user_schema).strip()
-        
-        # patron para definicion de tabla
         table_pattern = r'CREATE\s+TABLE\s+(\w+)\s*\((.*?)\)\s*;'
         table_matches = re.findall(table_pattern, normalized_schema, re.IGNORECASE | re.DOTALL)
         
-        # mapear fks: {tabla_local: {columna_local: (tabla_ref, columna_ref)}}
-        fk_map = {}
-        
-        # patron para encontrar fk dentro de los contenidos de la tabla
+        fk_list = []
         fk_pattern = r'FOREIGN\s+KEY\s*\(\s*(\w+)\s*\)\s*REFERENCES\s+(\w+)\s*\(\s*(\w+)\s*\)'
 
+        # extraer todas las fk y guardarlas en el formato: "t1.c1 = t2.c2"
         for table_name, table_content in table_matches:
             fk_matches = re.findall(fk_pattern, table_content, re.IGNORECASE)
-            
             if fk_matches:
-                fk_map[table_name] = {}
                 for local_col, ref_table, ref_col in fk_matches:
-                    # almacenamos el nombre de la tabla de referencia y la columna de referencia
-                    fk_map[table_name][local_col] = (ref_table, ref_col)
+                    fk_list.append(f"{table_name.lower()}.{local_col.lower()} = {ref_table.lower()}.{ref_col.lower()}")
 
-        # parsear con sqlglot y formatear al estilo entrenamiento
         try:
             parsed = sqlglot.parse(user_schema, read="mysql")
         except Exception:
@@ -64,7 +53,6 @@ class SQLGenerator:
             if not isinstance(expression, exp.Create):
                 continue
             
-            # obtener nombre de la tabla
             table_name = expression.this.this.name if isinstance(expression.this, exp.Schema) else (
                         expression.this.name if hasattr(expression.this, "name") else None)
             
@@ -73,51 +61,46 @@ class SQLGenerator:
 
             columns_formatted = []
             
-            # definicion de tipos
             def _get_simplified_type(raw_type: str) -> str:
                 raw_type = raw_type.lower()
-                if 'int' in raw_type or 'serial' in raw_type: return 'int'
+                if 'int' in raw_type or 'serial' in raw_type: return 'number'
                 if 'char' in raw_type or 'text' in raw_type or 'varchar' in raw_type: return 'text'
                 if 'date' in raw_type or 'time' in raw_type: return 'time'
                 if 'float' in raw_type or 'double' in raw_type or 'decimal' in raw_type: return 'number'
                 return 'text'
 
-            # procesar columnas
             if hasattr(expression.this, "expressions") and expression.this.expressions:
                 for def_col in expression.this.expressions:
                     if not isinstance(def_col, exp.ColumnDef):
                         continue
 
-                    col_name = def_col.name
-                    
-                    # tipo de datos
+                    col_name = def_col.name.lower()
                     raw_type = def_col.kind.sql() if def_col.kind else "text"
                     col_type = _get_simplified_type(raw_type)
 
-                    props: List[str] = []
-
-                    # detectar pk
+                    is_pk = False
                     for constraint in def_col.args.get("constraints", []):
                         if isinstance(constraint.kind, exp.PrimaryKeyColumnConstraint):
-                            props.append("PK")
+                            is_pk = True
                             break
                     
-                    # detectar fk usando el mapeo
-                    if table_name in fk_map and col_name in fk_map[table_name]:
-                        ref_table, ref_col = fk_map[table_name][col_name]
+                    # formato: "type name" o "type name (pk)"
+                    col_str = f"{col_type} {col_name}"
+                    if is_pk:
+                        col_str += " (pk)"
                         
-                        props.append(f"FK->{ref_table}.{ref_col}")
-
-                    # construir el string de la columna
-                    props_str = f", {', '.join(props)}" if props else ""
-                    columns_formatted.append(f"{col_name} ({col_type}{props_str})")
+                    columns_formatted.append(col_str)
 
             if table_name and columns_formatted:
-                # table_name : col1 (type, prop), col2 (type, prop)
-                tables_formatted.append(f"{table_name} : {', '.join(columns_formatted)}")
+                tables_formatted.append(f"{table_name.lower()} : {' , '.join(columns_formatted)}")
 
-        # el resultado final se une por ' | '
-        return " | ".join(tables_formatted)
+        schema_str = " | ".join(tables_formatted)
+        
+        # agregar las fk al final de todo el schema
+        if fk_list:
+            schema_str += f" | foreign keys: {', '.join(fk_list)}"
+            
+        return schema_str
     
     def generate_sql(self, natural_text: str, schema: Any = "", max_length: int = 256) -> str:        
         # convertir schema a string
@@ -130,19 +113,15 @@ class SQLGenerator:
         if schema_text:
             schema_text = self._serialize_schema(schema_text)
         
-        # combinar natural_text + schema para mejor contexto
-        prompt = (
-            f"Generate SQL query for the following question. "
-            f"Use standard SQL syntax with lowercase keywords. "
-            f"Question: {natural_text} | Database Schema: {schema_text}"
-        )
+        # prompt exacto con el que se entreno
+        prompt = f"translate to SQL: {natural_text} | db_id: custom_db | schema: {schema_text}"
         
         print(f"\nPrompt:\n{prompt}")
         
         input_ids = self.tokenizer(
             prompt,
             return_tensors="pt",
-            max_length=1024,
+            max_length=512,
             truncation=True
         ).input_ids.to(self.device)
         
@@ -152,7 +131,6 @@ class SQLGenerator:
                 max_length=max_length,
                 num_beams=5,
                 early_stopping=True,
-                repetition_penalty=1.0,
             )
         sql_query = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
         return sql_query
