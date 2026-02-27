@@ -1,81 +1,79 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Database, Sparkles } from "lucide-react"
+import { Database, Sparkles, BrainCircuit } from "lucide-react"
+
+const stagger = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.12 } },
+}
+const fade = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+}
 
 export function SlideTitle() {
   return (
-    <div className="flex h-full flex-col items-center justify-center text-center">
-      {/* Floating icon */}
-      <motion.div
-        initial={{ y: 10, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.1 }}
-        className="mb-8 flex items-center gap-3 rounded-full border border-primary/20 bg-primary/5 px-5 py-2.5 backdrop-blur-sm"
-      >
-        <Sparkles className="h-4 w-4 text-primary" />
-        <span className="text-sm font-medium text-primary">
+    <motion.div
+      variants={stagger}
+      initial="hidden"
+      animate="show"
+      className="flex w-full flex-col items-center gap-8 text-center"
+    >
+      {/* Floating icons */}
+      <motion.div variants={fade} className="flex items-center gap-6">
+        <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-border bg-secondary/60">
+          <Database className="h-7 w-7 text-primary" />
+        </div>
+        <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-primary/40 bg-primary/10 glow-cyan">
+          <Sparkles className="h-7 w-7 text-primary" />
+        </div>
+        <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-border bg-secondary/60">
+          <BrainCircuit className="h-7 w-7 text-accent" />
+        </div>
+      </motion.div>
+
+      {/* Badge */}
+      <motion.div variants={fade}>
+        <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 font-mono text-xs text-primary">
           Inteligencia Artificial - UNRC
         </span>
       </motion.div>
 
-      {/* Main title */}
+      {/* Title */}
       <motion.h1
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.2 }}
-        className="mb-6 max-w-4xl text-balance text-5xl font-bold leading-tight tracking-tight text-foreground lg:text-7xl"
+        variants={fade}
+        className="max-w-3xl text-balance text-5xl font-bold leading-tight tracking-tight text-foreground lg:text-6xl"
       >
-        Generador de Consultas{" "}
-        <span className="text-primary glow-text">SQL</span> con{" "}
+        Generador de Consultas SQL con{" "}
         <span className="text-primary glow-text">CodeT5p</span>
       </motion.h1>
 
       {/* Subtitle */}
       <motion.p
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.35 }}
-        className="mb-10 max-w-2xl text-pretty text-lg text-muted-foreground lg:text-xl"
+        variants={fade}
+        className="max-w-xl text-pretty text-lg leading-relaxed text-muted-foreground"
       >
-        Un sistema de Text-to-SQL que permite a usuarios sin conocimientos
-        tecnicos generar consultas SQL complejas escribiendo preguntas en
-        lenguaje natural
+        Sistema de Text-to-SQL que transforma preguntas en lenguaje natural a
+        consultas SQL complejas mediante fine-tuning de un modelo Transformer.
       </motion.p>
 
-      {/* Visual element - SQL transformation */}
-      <motion.div
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.5 }}
-        className="flex items-center gap-4"
-      >
-        <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-3 font-mono text-sm text-muted-foreground">
-          <span className="text-foreground">
-            {'"How many students are in CS?"'}
-          </span>
-        </div>
-        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
-          <Sparkles className="h-4 w-4 text-primary" />
-        </div>
-        <div className="flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/5 px-4 py-3 font-mono text-sm glow-cyan">
-          <Database className="h-4 w-4 text-primary" />
-          <span className="text-primary">SELECT count(*) FROM ...</span>
-        </div>
-      </motion.div>
+      {/* Divider */}
+      <motion.div variants={fade} className="h-px w-40 bg-border" />
 
-      {/* Team info */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.7 }}
-        className="mt-16 flex flex-col items-center gap-2 text-sm text-muted-foreground"
-      >
-        <p>Conti, Bruno &middot; Gonzalez, Juan Cruz &middot; Vollenweider, Erich</p>
-        <p className="text-muted-foreground/60">
+      {/* Team */}
+      <motion.div variants={fade} className="flex flex-col items-center gap-2">
+        <div className="flex items-center gap-4 text-sm text-foreground">
+          <span>Conti, Bruno</span>
+          <span className="h-1 w-1 rounded-full bg-primary" />
+          <span>Gonzalez, Juan Cruz</span>
+          <span className="h-1 w-1 rounded-full bg-primary" />
+          <span>Vollenweider, Erich</span>
+        </div>
+        <p className="text-xs text-muted-foreground">
           Universidad Nacional de Rio Cuarto
         </p>
       </motion.div>
-    </div>
+    </motion.div>
   )
 }

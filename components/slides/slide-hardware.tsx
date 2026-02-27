@@ -1,118 +1,111 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Cpu, HardDrive, AlertCircle, Maximize2 } from "lucide-react"
+import { Cpu, MemoryStick, AlertCircle, TrendingUp } from "lucide-react"
 
-const container = {
+const stagger = {
   hidden: {},
   show: { transition: { staggerChildren: 0.1 } },
 }
-const item = {
-  hidden: { y: 20, opacity: 0 },
-  show: { y: 0, opacity: 1 },
+const fade = {
+  hidden: { opacity: 0, y: 18 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 }
+
+const limitations = [
+  {
+    icon: MemoryStick,
+    title: "Restriccion de Parametros",
+    desc: "La VRAM limitada de la T4 nos impidio cargar modelos mas grandes de la familia de billones de parametros (CodeT5+ 2B/16B).",
+    color: "text-red-400",
+    bg: "bg-red-400/10",
+  },
+  {
+    icon: Cpu,
+    title: "Seleccion del Modelo",
+    desc: "CodeT5p-770m fue elegido como el modelo mas inteligente que matematicamente cabia en la memoria de la GPU.",
+    color: "text-primary",
+    bg: "bg-primary/10",
+  },
+  {
+    icon: TrendingUp,
+    title: "Impacto en Accuracy",
+    desc: "El 68.67% demuestra gran eficiencia. Escalar el tamano del modelo con mejor hardware impactaria positivamente en queries Extra Hard.",
+    color: "text-green-400",
+    bg: "bg-green-400/10",
+  },
+  {
+    icon: AlertCircle,
+    title: "Ventana de Contexto",
+    desc: "Limite de 512-1024 tokens. Bases de datos masivas de Spider (Hard/Extra Hard) exceden esta ventana, truncando tablas y claves foraneas.",
+    color: "text-yellow-400",
+    bg: "bg-yellow-400/10",
+  },
+]
 
 export function SlideHardware() {
   return (
     <motion.div
-      variants={container}
+      variants={stagger}
       initial="hidden"
       animate="show"
-      className="flex h-full flex-col justify-center"
+      className="flex w-full flex-col gap-8"
     >
-      <motion.div variants={item} className="mb-2 text-sm font-semibold uppercase tracking-widest text-primary">
-        Entorno de Entrenamiento
+      <motion.div variants={fade} className="flex flex-col gap-2">
+        <span className="font-mono text-xs uppercase tracking-widest text-primary">
+          10 &mdash; Hardware
+        </span>
+        <h2 className="text-balance text-3xl font-bold text-foreground lg:text-4xl">
+          Entorno de Entrenamiento y Limitaciones
+        </h2>
       </motion.div>
-      <motion.h2 variants={item} className="mb-8 text-balance text-4xl font-bold text-foreground lg:text-5xl">
-        Limitaciones de hardware y decisiones de ingenieria
-      </motion.h2>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Hardware specs */}
-        <motion.div variants={item} className="flex flex-col gap-4">
-          <div className="rounded-xl border border-primary/20 bg-primary/5 p-6">
-            <div className="mb-4 flex items-center gap-3">
-              <Cpu className="h-6 w-6 text-primary" />
-              <h3 className="text-lg font-semibold text-primary">Google Colab - GPU NVIDIA T4</h3>
+      {/* GPU Info */}
+      <motion.div variants={fade} className="rounded-lg border border-primary/20 bg-primary/5 p-5 glow-cyan">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-8">
+          <div className="flex items-center gap-4">
+            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-card">
+              <Cpu className="h-7 w-7 text-primary" />
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-lg bg-background/40 p-3 text-center">
-                <div className="text-2xl font-bold text-foreground">16 GB</div>
-                <div className="text-xs text-muted-foreground">VRAM disponible</div>
-              </div>
-              <div className="rounded-lg bg-background/40 p-3 text-center">
-                <div className="text-2xl font-bold text-foreground">770M</div>
-                <div className="text-xs text-muted-foreground">Parametros del modelo</div>
-              </div>
-              <div className="rounded-lg bg-background/40 p-3 text-center">
-                <div className="text-2xl font-bold text-foreground">512</div>
-                <div className="text-xs text-muted-foreground">Max tokens de entrada</div>
-              </div>
-              <div className="rounded-lg bg-background/40 p-3 text-center">
-                <div className="text-2xl font-bold text-foreground">5</div>
-                <div className="text-xs text-muted-foreground">Beam Search</div>
-              </div>
+            <div>
+              <p className="text-lg font-bold text-foreground">Google Colab</p>
+              <p className="text-sm text-muted-foreground">GPU NVIDIA T4</p>
             </div>
           </div>
-
-          <div className="rounded-xl border border-border bg-card/60 p-5 backdrop-blur-sm">
-            <div className="mb-3 flex items-center gap-2">
-              <HardDrive className="h-5 w-5 text-muted-foreground" />
-              <h3 className="font-semibold text-foreground">Seleccion del Modelo</h3>
+          <div className="flex gap-6">
+            <div>
+              <p className="text-2xl font-bold text-primary">16 GB</p>
+              <p className="text-xs text-muted-foreground">VRAM</p>
             </div>
-            <p className="text-sm leading-relaxed text-muted-foreground">
-              La memoria VRAM limitada de la T4 impidio cargar LLMs mas grandes
-              (CodeT5+ 2B/16B). <span className="text-primary">CodeT5p-770m</span> fue el modelo mas inteligente
-              que cabia en la GPU, siendo el punto optimo entre capacidad de
-              razonamiento y viabilidad de entrenamiento.
-            </p>
-          </div>
-        </motion.div>
-
-        {/* Limitations */}
-        <motion.div variants={item} className="flex flex-col gap-4">
-          <div className="rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-5">
-            <div className="mb-3 flex items-center gap-2">
-              <AlertCircle className="h-5 w-5 text-yellow-400" />
-              <h3 className="font-semibold text-yellow-400">Ventana de Contexto y Truncamiento</h3>
+            <div>
+              <p className="text-2xl font-bold text-foreground">770M</p>
+              <p className="text-xs text-muted-foreground">Parametros</p>
             </div>
-            <p className="text-sm leading-relaxed text-muted-foreground">
-              El modelo procesa un limite maximo de <span className="text-foreground">512-1024 tokens</span> por inferencia.
-              Las bases de datos masivas de Spider (decenas de tablas, cientos de columnas) exceden esta ventana,
-              provocando que el tokenizador <span className="text-yellow-400">trunce el final del prompt</span>.
-            </p>
-            <div className="mt-3 rounded-lg bg-background/40 p-3">
-              <p className="text-xs text-muted-foreground">
-                Esto deja al modelo {'"ciego"'} ante las ultimas tablas o claves foraneas,
-                explicando gran parte de la caida de precision en dificultades{" "}
-                <span className="font-semibold text-yellow-400">Hard</span> y{" "}
-                <span className="font-semibold text-yellow-400">Extra Hard</span>.
-              </p>
+            <div>
+              <p className="text-2xl font-bold text-foreground">512</p>
+              <p className="text-xs text-muted-foreground">Max Tokens</p>
             </div>
           </div>
+        </div>
+      </motion.div>
 
-          <div className="rounded-xl border border-border bg-card/60 p-5 backdrop-blur-sm">
-            <div className="mb-3 flex items-center gap-2">
-              <Maximize2 className="h-5 w-5 text-primary" />
-              <h3 className="font-semibold text-foreground">Impacto en el Accuracy</h3>
-            </div>
-            <p className="text-sm leading-relaxed text-muted-foreground">
-              Aunque el modelo logro un excelente <span className="font-bold text-primary">68.67%</span> demostrando gran eficiencia,
-              escalar el tamanio del modelo con hardware superior impactaria directamente en el porcentaje final,
-              especialmente en las consultas Extra Hard.
-            </p>
-            <div className="mt-3 grid grid-cols-2 gap-2">
-              <div className="rounded-lg bg-muted/30 p-2 text-center">
-                <div className="text-lg font-bold text-green-400">84.7%</div>
-                <div className="text-xs text-muted-foreground">Easy</div>
+      {/* Limitations grid */}
+      <div className="grid gap-4 sm:grid-cols-2">
+        {limitations.map((l) => (
+          <motion.div
+            key={l.title}
+            variants={fade}
+            className="rounded-lg border border-border bg-card p-4"
+          >
+            <div className="mb-2 flex items-center gap-3">
+              <div className={`flex h-8 w-8 items-center justify-center rounded-md ${l.bg}`}>
+                <l.icon className={`h-4 w-4 ${l.color}`} />
               </div>
-              <div className="rounded-lg bg-muted/30 p-2 text-center">
-                <div className="text-lg font-bold text-red-400">44.0%</div>
-                <div className="text-xs text-muted-foreground">Extra Hard</div>
-              </div>
+              <h3 className="text-sm font-semibold text-foreground">{l.title}</h3>
             </div>
-          </div>
-        </motion.div>
+            <p className="text-xs leading-relaxed text-muted-foreground">{l.desc}</p>
+          </motion.div>
+        ))}
       </div>
     </motion.div>
   )

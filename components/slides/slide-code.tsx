@@ -1,144 +1,148 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Zap, Target } from "lucide-react"
 
-const container = {
+const stagger = {
   hidden: {},
   show: { transition: { staggerChildren: 0.1 } },
 }
-const item = {
-  hidden: { y: 20, opacity: 0 },
-  show: { y: 0, opacity: 1 },
+const fade = {
+  hidden: { opacity: 0, y: 18 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 }
 
 export function SlideCode() {
   return (
     <motion.div
-      variants={container}
+      variants={stagger}
       initial="hidden"
       animate="show"
-      className="flex h-full flex-col justify-center"
+      className="flex w-full flex-col gap-6"
     >
-      <motion.div variants={item} className="mb-2 text-sm font-semibold uppercase tracking-widest text-primary">
-        Fine-Tuning y Prompt Engineering
+      <motion.div variants={fade} className="flex flex-col gap-2">
+        <span className="font-mono text-xs uppercase tracking-widest text-primary">
+          07 &mdash; Implementacion
+        </span>
+        <h2 className="text-balance text-3xl font-bold text-foreground lg:text-4xl">
+          Codigo Clave
+        </h2>
       </motion.div>
-      <motion.h2 variants={item} className="mb-8 text-balance text-4xl font-bold text-foreground lg:text-5xl">
-        Entrenamiento sobre el dataset Spider
-      </motion.h2>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Left - Training details */}
-        <motion.div variants={item} className="flex flex-col gap-4">
-          <div className="rounded-xl border border-border bg-card/60 p-5 backdrop-blur-sm">
-            <div className="mb-3 flex items-center gap-2">
-              <Zap className="h-5 w-5 text-primary" />
-              <h3 className="font-semibold text-foreground">Proceso de Fine-Tuning</h3>
-            </div>
-            <div className="flex flex-col gap-2 text-sm text-muted-foreground">
-              <div className="flex items-center justify-between rounded-lg bg-muted/30 px-3 py-2">
-                <span>Modelo base</span>
-                <span className="font-mono text-foreground">CodeT5p-770m</span>
-              </div>
-              <div className="flex items-center justify-between rounded-lg bg-muted/30 px-3 py-2">
-                <span>Dataset</span>
-                <span className="font-mono text-foreground">Spider (Yale)</span>
-              </div>
-              <div className="flex items-center justify-between rounded-lg bg-muted/30 px-3 py-2">
-                <span>Muestras de entrenamiento</span>
-                <span className="font-mono text-foreground">8,659</span>
-              </div>
-              <div className="flex items-center justify-between rounded-lg bg-muted/30 px-3 py-2">
-                <span>GPU</span>
-                <span className="font-mono text-foreground">NVIDIA T4 (16GB)</span>
-              </div>
-              <div className="flex items-center justify-between rounded-lg bg-muted/30 px-3 py-2">
-                <span>Num Beams (inferencia)</span>
-                <span className="font-mono text-foreground">5</span>
-              </div>
-              <div className="flex items-center justify-between rounded-lg bg-muted/30 px-3 py-2">
-                <span>Max Length (tokens)</span>
-                <span className="font-mono text-foreground">512</span>
-              </div>
-            </div>
+      <div className="grid gap-4 lg:grid-cols-2">
+        {/* Serialization */}
+        <motion.div variants={fade} className="overflow-hidden rounded-lg border border-border bg-card">
+          <div className="flex items-center gap-2 border-b border-border bg-muted/30 px-4 py-2">
+            <div className="h-2.5 w-2.5 rounded-full bg-red-400" />
+            <div className="h-2.5 w-2.5 rounded-full bg-yellow-400" />
+            <div className="h-2.5 w-2.5 rounded-full bg-green-400" />
+            <span className="ml-2 font-mono text-[10px] text-muted-foreground">model.py - Serializacion</span>
           </div>
-
-          <div className="rounded-xl border border-primary/20 bg-primary/5 p-5 backdrop-blur-sm">
-            <div className="mb-3 flex items-center gap-2">
-              <Target className="h-5 w-5 text-primary" />
-              <h3 className="font-semibold text-primary">Factor Critico: Alineacion Train-Inference</h3>
-            </div>
-            <p className="text-sm leading-relaxed text-muted-foreground">
-              El modelo debe recibir el prompt <span className="text-primary">exactamente</span> con los mismos delimitadores
-              rigidos con los que fue entrenado. Cualquier alteracion en el formato
-              provoca caidas significativas en el rendimiento.
-            </p>
-          </div>
+          <pre className="overflow-x-auto p-4 font-mono text-[11px] leading-relaxed">
+            <code>
+{`def _serialize_schema(self, user_schema):
+  """
+  Convierte SQL DDL al formato
+  de entrenamiento
+  """
+  parsed = sqlglot.parse(
+    user_schema, read="mysql"
+  )
+  # Extraer tablas, columnas, PKs, FKs
+  # Formato: table : type col (pk) , ...
+  # | foreign keys: t1.c1 = t2.c2
+  return schema_str`}
+            </code>
+          </pre>
         </motion.div>
 
-        {/* Right - Code example */}
-        <motion.div variants={item} className="flex flex-col gap-4">
-          <div className="rounded-xl border border-border bg-card/80 p-5 backdrop-blur-sm">
-            <div className="mb-3 flex items-center gap-2">
-              <div className="h-3 w-3 rounded-full bg-red-500/70" />
-              <div className="h-3 w-3 rounded-full bg-yellow-500/70" />
-              <div className="h-3 w-3 rounded-full bg-green-500/70" />
-              <span className="ml-2 text-xs text-muted-foreground">model.py - generate_sql()</span>
-            </div>
-            <pre className="overflow-x-auto font-mono text-xs leading-relaxed">
-              <code>
-{`# Prompt exacto con el que se entreno
-prompt = f"translate to SQL: {natural_text}`}
-{`  | db_id: custom_db`}
-{`  | schema: {schema_text}"`}
-{``}
-{`input_ids = self.tokenizer(`}
-{`    prompt,`}
-{`    return_tensors="pt",`}
-{`    max_length=512,`}
-{`    truncation=True`}
-{`).input_ids.to(self.device)`}
-{``}
-{`with torch.no_grad():`}
-{`    outputs = self.model.generate(`}
-{`        input_ids,`}
-{`        max_length=256,`}
-{`        `}<span className="text-primary">num_beams=5</span>{`,`}
-{`        early_stopping=True,`}
-{`    )`}
-{``}
-{`sql = self.tokenizer.decode(`}
-{`    outputs[0],`}
-{`    skip_special_tokens=True`}
-{`)`}
-              </code>
-            </pre>
+        {/* Generation */}
+        <motion.div variants={fade} className="overflow-hidden rounded-lg border border-border bg-card">
+          <div className="flex items-center gap-2 border-b border-border bg-muted/30 px-4 py-2">
+            <div className="h-2.5 w-2.5 rounded-full bg-red-400" />
+            <div className="h-2.5 w-2.5 rounded-full bg-yellow-400" />
+            <div className="h-2.5 w-2.5 rounded-full bg-green-400" />
+            <span className="ml-2 font-mono text-[10px] text-muted-foreground">model.py - Generacion</span>
           </div>
+          <pre className="overflow-x-auto p-4 font-mono text-[11px] leading-relaxed">
+            <code>
+{`def generate_sql(self, text, schema):
+  schema = self._serialize_schema(schema)
 
-          <div className="rounded-xl border border-border bg-card/80 p-5 backdrop-blur-sm">
-            <div className="mb-3 flex items-center gap-2">
-              <div className="h-3 w-3 rounded-full bg-red-500/70" />
-              <div className="h-3 w-3 rounded-full bg-yellow-500/70" />
-              <div className="h-3 w-3 rounded-full bg-green-500/70" />
-              <span className="ml-2 text-xs text-muted-foreground">model.py - _serialize_schema()</span>
-            </div>
-            <pre className="overflow-x-auto font-mono text-xs leading-relaxed">
-              <code>
-{`# Convierte DDL al formato de entrenamiento`}
-{`# Entrada: CREATE TABLE department (...);`}
-{`# Salida:  department : number id (pk)`}
-{`#          , text name`}
-{``}
-{`parsed = `}<span className="text-primary">sqlglot</span>{`.parse(user_schema)`}
-{``}
-{`for expression in parsed:`}
-{`    if isinstance(expression, exp.Create):`}
-{`        # Extraer columnas y tipos`}
-{`        # Detectar primary keys`}
-{`        # Recopilar foreign keys`}
-              </code>
-            </pre>
+  # Prompt alineado al entrenamiento
+  prompt = f"translate to SQL: {text}"
+          f" | db_id: custom_db"
+          f" | schema: {schema}"
+
+  ids = self.tokenizer(
+    prompt, max_length=512
+  ).input_ids
+
+  out = self.model.generate(
+    ids,
+    num_beams=5,
+    early_stopping=True
+  )
+  return self.tokenizer.decode(out[0])`}
+            </code>
+          </pre>
+        </motion.div>
+
+        {/* API */}
+        <motion.div variants={fade} className="overflow-hidden rounded-lg border border-border bg-card">
+          <div className="flex items-center gap-2 border-b border-border bg-muted/30 px-4 py-2">
+            <div className="h-2.5 w-2.5 rounded-full bg-red-400" />
+            <div className="h-2.5 w-2.5 rounded-full bg-yellow-400" />
+            <div className="h-2.5 w-2.5 rounded-full bg-green-400" />
+            <span className="ml-2 font-mono text-[10px] text-muted-foreground">api.py - Endpoint</span>
           </div>
+          <pre className="overflow-x-auto p-4 font-mono text-[11px] leading-relaxed">
+            <code>
+{`@app.post("/api/generate-sql")
+def generate_sql(request: SQLRequest):
+  generator = get_sql_generator()
+  sql = generator.generate_sql(
+    request.natural_text,
+    request.db_schema
+  )
+  return {
+    "success": True,
+    "sql_query": sql
+  }`}
+            </code>
+          </pre>
+        </motion.div>
+
+        {/* Frontend state */}
+        <motion.div variants={fade} className="overflow-hidden rounded-lg border border-border bg-card">
+          <div className="flex items-center gap-2 border-b border-border bg-muted/30 px-4 py-2">
+            <div className="h-2.5 w-2.5 rounded-full bg-red-400" />
+            <div className="h-2.5 w-2.5 rounded-full bg-yellow-400" />
+            <div className="h-2.5 w-2.5 rounded-full bg-green-400" />
+            <span className="ml-2 font-mono text-[10px] text-muted-foreground">app_state.py - Frontend</span>
+          </div>
+          <pre className="overflow-x-auto p-4 font-mono text-[11px] leading-relaxed">
+            <code>
+{`class AppState(rx.State):
+  query: str = ""
+  schema_input: str = ""
+  result: str = ""
+  is_loading: bool = False
+
+  async def handle_generate(self):
+    payload = {
+      "natural_text": self.query,
+      "schema": self.schema_input
+    }
+    async with httpx.AsyncClient() as c:
+      resp = await c.post(
+        "http://127.0.0.1:8000"
+        "/api/generate-sql",
+        json=payload
+      )
+    data = resp.json()
+    self.result = data["sql_query"]`}
+            </code>
+          </pre>
         </motion.div>
       </div>
     </motion.div>

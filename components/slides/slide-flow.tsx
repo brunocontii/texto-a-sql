@@ -1,47 +1,52 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { ArrowDown } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 
-const container = {
+const stagger = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.12 } },
+  show: { transition: { staggerChildren: 0.1 } },
 }
-const item = {
-  hidden: { y: 20, opacity: 0 },
-  show: { y: 0, opacity: 1 },
+const fade = {
+  hidden: { opacity: 0, y: 18 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 }
 
 export function SlideFlow() {
   return (
     <motion.div
-      variants={container}
+      variants={stagger}
       initial="hidden"
       animate="show"
-      className="flex h-full flex-col justify-center"
+      className="flex w-full flex-col gap-6"
     >
-      <motion.div variants={item} className="mb-2 text-sm font-semibold uppercase tracking-widest text-primary">
-        Flujo de Ejecucion
+      <motion.div variants={fade} className="flex flex-col gap-2">
+        <span className="font-mono text-xs uppercase tracking-widest text-primary">
+          06 &mdash; Flujo de Ejecucion
+        </span>
+        <h2 className="text-balance text-3xl font-bold text-foreground lg:text-4xl">
+          De la pregunta a la consulta SQL
+        </h2>
       </motion.div>
-      <motion.h2 variants={item} className="mb-8 text-balance text-3xl font-bold text-foreground lg:text-4xl">
-        De la pregunta del usuario a la consulta SQL
-      </motion.h2>
 
-      <div className="flex flex-col gap-3">
-        {/* Step 1 - User Input */}
-        <motion.div variants={item} className="rounded-xl border border-border bg-card/60 p-4 backdrop-blur-sm">
-          <div className="mb-2 flex items-center gap-3">
-            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/20 text-xs font-bold text-primary">1</span>
-            <h3 className="text-sm font-semibold text-foreground">Entrada del Usuario</h3>
+      {/* Step 1 */}
+      <motion.div variants={fade} className="rounded-lg border border-border bg-card p-4">
+        <div className="mb-2 flex items-center gap-2">
+          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+            1
+          </span>
+          <h3 className="text-sm font-semibold text-foreground">Entrada del Usuario</h3>
+        </div>
+        <div className="grid gap-3 lg:grid-cols-2">
+          <div className="rounded-md border border-border bg-muted/30 p-3">
+            <p className="mb-1 font-mono text-[10px] uppercase text-muted-foreground">Pregunta</p>
+            <p className="font-mono text-xs text-green-400">
+              &quot;How many students belong to the Computer Science department?&quot;
+            </p>
           </div>
-          <div className="ml-10 grid gap-3 lg:grid-cols-2">
-            <div className="rounded-lg bg-muted/30 p-3">
-              <div className="mb-1 text-xs text-muted-foreground">Pregunta:</div>
-              <code className="text-sm text-foreground">{'"How many students belong to the Computer Science department?"'}</code>
-            </div>
-            <div className="rounded-lg bg-muted/30 p-3">
-              <div className="mb-1 text-xs text-muted-foreground">Schema DDL:</div>
-              <pre className="font-mono text-xs leading-relaxed text-muted-foreground">
+          <div className="rounded-md border border-border bg-muted/30 p-3">
+            <p className="mb-1 font-mono text-[10px] uppercase text-muted-foreground">Schema DDL</p>
+            <pre className="font-mono text-[11px] leading-relaxed text-foreground/80">
 {`CREATE TABLE department (
   id int PRIMARY KEY, name text
 );
@@ -51,63 +56,60 @@ CREATE TABLE student (
   FOREIGN KEY (department_id)
     REFERENCES department(id)
 );`}
-              </pre>
-            </div>
+            </pre>
           </div>
-        </motion.div>
+        </div>
+      </motion.div>
 
-        <motion.div variants={item} className="flex justify-center">
-          <ArrowDown className="h-5 w-5 text-primary/40" />
-        </motion.div>
+      {/* Arrow */}
+      <motion.div variants={fade} className="flex justify-center">
+        <ArrowRight className="h-4 w-4 rotate-90 text-primary/50" />
+      </motion.div>
 
-        {/* Step 2 - Serialization */}
-        <motion.div variants={item} className="rounded-xl border border-border bg-card/60 p-4 backdrop-blur-sm">
-          <div className="mb-2 flex items-center gap-3">
-            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-accent/20 text-xs font-bold text-accent">2</span>
-            <h3 className="text-sm font-semibold text-foreground">Parseo y Serializacion (Backend)</h3>
-          </div>
-          <div className="ml-10 rounded-lg bg-muted/30 p-3">
-            <div className="mb-1 text-xs text-muted-foreground">Schema transformado:</div>
-            <code className="font-mono text-xs leading-relaxed text-primary">
-              {'department : number department_id (pk) , text name | student : number student_id (pk) , text name , number department_id | foreign keys: student.department_id = department.department_id'}
-            </code>
-          </div>
-        </motion.div>
+      {/* Step 2 */}
+      <motion.div variants={fade} className="rounded-lg border border-border bg-card p-4">
+        <div className="mb-2 flex items-center gap-2">
+          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+            2
+          </span>
+          <h3 className="text-sm font-semibold text-foreground">Parseo y Serializacion (sqlglot + regex)</h3>
+        </div>
+        <div className="rounded-md border border-primary/20 bg-primary/5 p-3">
+          <pre className="overflow-x-auto font-mono text-[11px] leading-relaxed text-primary">
+{`department : number department_id (pk) , text name
+| student : number student_id (pk) , text name ,
+number department_id
+| foreign keys: student.department_id =
+department.department_id`}
+          </pre>
+        </div>
+      </motion.div>
 
-        <motion.div variants={item} className="flex justify-center">
-          <ArrowDown className="h-5 w-5 text-primary/40" />
-        </motion.div>
+      <motion.div variants={fade} className="flex justify-center">
+        <ArrowRight className="h-4 w-4 rotate-90 text-primary/50" />
+      </motion.div>
 
-        {/* Step 3 - Prompt */}
-        <motion.div variants={item} className="rounded-xl border border-primary/20 bg-primary/5 p-4 backdrop-blur-sm">
-          <div className="mb-2 flex items-center gap-3">
-            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/20 text-xs font-bold text-primary">3</span>
-            <h3 className="text-sm font-semibold text-foreground">Prompt Final al Modelo</h3>
-          </div>
-          <div className="ml-10 rounded-lg bg-background/60 p-3">
-            <code className="font-mono text-xs leading-relaxed text-muted-foreground">
-              <span className="text-primary">translate to SQL:</span> How many students belong to the Computer Science department? <span className="text-accent">| db_id:</span> custom_db <span className="text-accent">| schema:</span> department : number ...
-            </code>
-          </div>
-        </motion.div>
-
-        <motion.div variants={item} className="flex justify-center">
-          <ArrowDown className="h-5 w-5 text-primary/40" />
-        </motion.div>
-
-        {/* Step 4 - Output */}
-        <motion.div variants={item} className="rounded-xl border border-primary/30 bg-primary/5 p-4 backdrop-blur-sm glow-cyan">
-          <div className="mb-2 flex items-center gap-3">
-            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/30 text-xs font-bold text-primary">4</span>
-            <h3 className="text-sm font-semibold text-primary">SQL Generado</h3>
-          </div>
-          <div className="ml-10 rounded-lg bg-background/60 p-3">
-            <code className="font-mono text-sm text-primary">
-              {'SELECT count(*) FROM student AS T1 JOIN department AS T2 ON T1.department_id = T2.id WHERE T2.name = \'Computer Science\''}
-            </code>
-          </div>
-        </motion.div>
-      </div>
+      {/* Step 3 */}
+      <motion.div variants={fade} className="rounded-lg border border-border bg-card p-4">
+        <div className="mb-2 flex items-center gap-2">
+          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+            3
+          </span>
+          <h3 className="text-sm font-semibold text-foreground">Prompt Final + Respuesta del Modelo</h3>
+        </div>
+        <div className="mb-3 rounded-md border border-border bg-muted/30 p-3">
+          <p className="mb-1 font-mono text-[10px] uppercase text-muted-foreground">Prompt</p>
+          <p className="font-mono text-[11px] leading-relaxed text-yellow-400">
+            translate to SQL: How many students... | db_id: custom_db | schema: department : number department_id (pk) ...
+          </p>
+        </div>
+        <div className="rounded-md border border-green-400/20 bg-green-400/5 p-3">
+          <p className="mb-1 font-mono text-[10px] uppercase text-muted-foreground">SQL Generado</p>
+          <p className="font-mono text-xs text-green-400">
+            SELECT count(*) FROM student AS T1 JOIN department AS T2 ON T1.department_id = T2.id WHERE T2.name = &apos;Computer Science&apos;
+          </p>
+        </div>
+      </motion.div>
     </motion.div>
   )
 }
