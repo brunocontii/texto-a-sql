@@ -1,6 +1,7 @@
 import reflex as rx
 import httpx
 import asyncio
+from frontend.utils.token import calculate_tokens
 
 class AppState(rx.State):
     """
@@ -14,6 +15,10 @@ class AppState(rx.State):
     is_loading: bool = False    # estado de carga
     is_copied: bool = False     # estado de copiado
     
+    # variables para el cálculo de tokens
+    token_count: int = 0
+    is_calculating_tokens: bool = False
+
     # placeholders
     schema_placeholder: str = """CREATE TABLE Pet (
  id INTEGER PRIMARY KEY,
@@ -33,9 +38,29 @@ CREATE TABLE Owner (
     # se usa para deshabilitar el boton si los campos estan vacios.
     @rx.var
     def is_form_valid(self) -> bool:
-        return (len(self.query.strip()) > 0) & (len(self.schema_input.strip()) > 0)
+        # Habilitar el botón de generar solo si hay texto y si los tokens no superan el límite
+        has_content = (len(self.query.strip()) > 0) & (len(self.schema_input.strip()) > 0)
+        within_limits = self.token_count <= 512 if self.token_count > 0 else True
+        return has_content & within_limits
 
-    # conexion con la api
+    @rx.var
+    def is_over_limit(self) -> bool:
+        return self.token_count > 512
+    
+    # --- NUEVA FUNCIÓN PARA CALCULAR TOKENS ---
+    async def handle_calculate_tokens(self):
+        """Manejador para el botón de calcular tokens"""
+        self.is_calculating_tokens = True
+        yield  # Actualiza la UI para mostrar "Calculando..."
+        
+        # Ejecutamos el conteo
+        resultado = calculate_tokens(self.query, self.schema_input)
+        self.token_count = resultado["total_tokens"]
+        
+        self.is_calculating_tokens = False
+        yield
+        
+    # --- FUNCIÓN ORIGINAL PARA GENERAR SQL ---
     async def handle_generate(self):
         """
         Llama a la API para generar la consulta SQL basada en la consulta en lenguaje natural y el esquema proporcionado.

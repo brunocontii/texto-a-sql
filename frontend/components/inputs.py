@@ -35,17 +35,6 @@ def query_section():
                 resize="none",
                 width="100%"
             ),
-            # boton para generar SQL
-            rx.button(
-                rx.cond(AppState.is_loading, "Generando SQL...", "Generar SQL"),
-                on_click=AppState.handle_generate, # type: ignore
-                loading=AppState.is_loading,
-                disabled=~AppState.is_form_valid,
-                width="100%",
-                size="3",
-                variant="solid",
-                cursor="pointer",
-            ),
             spacing="4",
             width="100%"
         ),
