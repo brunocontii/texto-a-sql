@@ -2,7 +2,7 @@ import re
 import torch
 import sqlglot
 from sqlglot import exp
-from typing import List, Any
+from typing import Any
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
 class SQLGenerator:
