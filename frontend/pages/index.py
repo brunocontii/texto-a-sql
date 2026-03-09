@@ -96,8 +96,11 @@ def index() -> rx.Component:
                 # seccion de resultados, solo si hay resultado
                 result_display(),
                 padding_y="3rem",
-                max_width="1200px"
+                width="100%",
+                max_width="1400px"
             ),
+            size="4", 
+            width="100%"
         ),
         min_height="100vh",
         bg=rx.color("gray", 1)

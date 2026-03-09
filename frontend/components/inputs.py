@@ -29,10 +29,10 @@ def query_section():
                 placeholder=AppState.query_placeholder,
                 value=AppState.query,
                 on_change=AppState.set_query, # type: ignore
-                min_height="200px",
+                min_height="350px",
                 font_family="monospace",
-                size="2",
-                resize="none",
+                size="3",
+                resize="vertical",
                 width="100%"
             ),
             spacing="4",
@@ -69,10 +69,10 @@ def schema_section():
                 placeholder=AppState.schema_placeholder,
                 value=AppState.schema_input,
                 on_change=AppState.set_schema_input, # type: ignore
-                min_height="200px",
+                min_height="350px",
                 font_family="monospace",
-                size="2",
-                resize="none",
+                size="3",
+                resize="vertical",
                 width="100%"
             ),
             spacing="4",
